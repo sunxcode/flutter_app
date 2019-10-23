@@ -1,4 +1,3 @@
-import 'package:custom_widgets/custom_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/bean/hitokoto.dart';
 import 'package:flutter_app/login/page/login_page.dart';
@@ -71,7 +70,7 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
   void goToHomePage() async {
     firstOpen = SpUtil.getBool('first_open', defValue: true);
 
-    print(firstOpen);
+    debugPrint("$firstOpen");
     if (!firstOpen) {
       if (Store.value<UserModel>(context).isLogin()) {
         pushAndRemovePage(context, HomePage());

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:flutter_app/bean/music.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:intl/intl.dart';
@@ -28,8 +29,9 @@ class _FlutterSoundPageState extends State<FlutterSoundPage>
   int onTop = 0;
 
   // 基本信息
-  String _name = musicBase[0]['name'];
-  String _artists = musicBase[0]['artists'];
+  String _name;
+
+  String _artists;
 
   FlutterSound flutterSound = FlutterSound(); //创建一个播放实例
 
@@ -47,6 +49,8 @@ class _FlutterSoundPageState extends State<FlutterSoundPage>
   @override
   void initState() {
     super.initState();
+    _name = songsData[0].title;
+    _artists = songsData[0].artists;
 
     _controller =
         AnimationController(duration: Duration(seconds: 15), vsync: this);
@@ -74,14 +78,14 @@ class _FlutterSoundPageState extends State<FlutterSoundPage>
                   itemBuilder: (BuildContext context, int index) =>
                       AnimatedCDView(
                           animation: _controller,
-                          imageUrl: musicBase[index]['img1v1Url']),
+                          imageUrl: songsData[index].albumArtUrl),
                   onIndexChanged: (i) => setState(() {
                         onTop = i;
-                        _name = musicBase[i]['name'];
-                        _artists = musicBase[i]['artists'];
+                        _name = songsData[0].title;
+                        _artists = songsData[i].artists;
                         startPlay();
                       }),
-                  itemCount: musicBase.length,
+                  itemCount: songsData.length,
                   viewportFraction: 0.70,
                   scale: 0.6)),
           // name
@@ -101,56 +105,57 @@ class _FlutterSoundPageState extends State<FlutterSoundPage>
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 // unlike
-                RawMaterialButton(
-                    onPressed: () {},
-                    shape: CircleBorder(),
-                    fillColor: Colors.white,
-                    splashColor: lightAccentColor,
-                    highlightColor: lightAccentColor.withOpacity(0.5),
-                    elevation: 5.0,
-                    highlightElevation: 5,
-                    child: Padding(
-                        padding: EdgeInsets.all(10), child: Icon(Icons.close))),
+                CircleButton(
+                  onPressedAction: () {},
+                  fillColor: Colors.white,
+                  splashColor: lightAccentColor,
+                  highlightColor: lightAccentColor.withOpacity(0.5),
+                  elevation: 5.0,
+                  highlightElevation: 5,
+                  icon: Icons.close,
+                  iconColor: Theme.of(context).primaryColor,
+                  iconSize: 20,
+                ),
                 // play && pause
-                RawMaterialButton(
-                    onPressed: () => setState(() {
-                          isPlay = !isPlay;
-                          if (isPlay) {
-                            _controller.repeat();
-                            if (_isPlaying) {
-                              flutterSound.resumePlayer();
-                            } else {
-                              startPlay();
-                            }
-                          } else {
-                            _controller.stop();
-                            if (_isPlaying) {
-                              flutterSound.pausePlayer();
-                            }
-                          }
-                        }),
-                    shape: CircleBorder(),
-                    fillColor: Colors.white,
-                    splashColor: lightAccentColor,
-                    highlightColor: lightAccentColor.withOpacity(0.5),
-                    elevation: 0.0,
-                    highlightElevation: 5,
-                    child: Padding(
-                        padding: EdgeInsets.all(22),
-                        child: Icon(isPlay ? Icons.pause : Icons.play_arrow))),
+                CircleButton(
+                  onPressedAction: () => setState(() {
+                    isPlay = !isPlay;
+                    if (isPlay) {
+                      _controller.repeat();
+                      if (_isPlaying) {
+                        flutterSound.resumePlayer();
+                      } else {
+                        startPlay();
+                      }
+                    } else {
+                      _controller.stop();
+                      if (_isPlaying) {
+                        flutterSound.pausePlayer();
+                      }
+                    }
+                  }),
+                  size: 80,
+                  fillColor: Colors.white,
+                  splashColor: lightAccentColor,
+                  highlightColor: lightAccentColor.withOpacity(0.5),
+                  elevation: 8.0,
+                  highlightElevation: 5,
+                  icon: isPlay ? Icons.pause : Icons.play_arrow,
+                  iconColor: Theme.of(context).primaryColor,
+                  iconSize: 50,
+                ),
                 // like
-                RawMaterialButton(
-                    onPressed: () => setState(() =>
-                        musicBase[onTop]['like'] = !musicBase[onTop]['like']),
-                    shape: CircleBorder(),
-                    fillColor: Colors.white,
-                    splashColor: lightAccentColor,
-                    highlightColor: lightAccentColor.withOpacity(0.5),
-                    elevation: 5.0,
-                    highlightElevation: 5,
-                    child: Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Icon(Icons.favorite_border)))
+                CircleButton(
+                  onPressedAction: () {},
+                  fillColor: Colors.white,
+                  splashColor: lightAccentColor,
+                  highlightColor: lightAccentColor.withOpacity(0.5),
+                  elevation: 5.0,
+                  highlightElevation: 5,
+                  icon: Icons.favorite_border,
+                  iconColor: Theme.of(context).primaryColor,
+                  iconSize: 20,
+                )
               ]),
           // 进度条
           Slider(
@@ -188,7 +193,7 @@ class _FlutterSoundPageState extends State<FlutterSoundPage>
       flutterSound.stopPlayer();
     }
 
-    await flutterSound.startPlayer(musicBase[onTop]['url']);
+    await flutterSound.startPlayer(songsData[onTop].audioPath);
 
     try {
       setState(() {

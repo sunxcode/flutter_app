@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/bean/movie.dart';
-import 'package:flutter_app/movie/ui/item_comment.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 
 import '../../page_index.dart';
+import '../index.dart';
 
 class MovieCommentPage extends StatefulWidget {
   final String id;
@@ -17,14 +16,14 @@ class MovieCommentPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _MovieCommentPageState createState() => _MovieCommentPageState();
+  createState() => _MovieCommentPageState();
 }
 
 class _MovieCommentPageState extends State<MovieCommentPage> {
   List<Reviews> comments = [];
 
   int page = 1;
-  int pagesize = 20;
+  int pageSize = 20;
 
   bool isFirst = true;
   bool isLoadComplete = false;
@@ -33,7 +32,7 @@ class _MovieCommentPageState extends State<MovieCommentPage> {
   void initState() {
     super.initState();
 
-    getCommentsList(widget.id, page, pagesize, RefreshType.DEFAULT);
+    getCommentsList(widget.id, page, RefreshType.DEFAULT);
   }
 
   @override
@@ -52,9 +51,9 @@ class _MovieCommentPageState extends State<MovieCommentPage> {
     );
   }
 
-  void getCommentsList(movieId, int page, int pagesize, loadDataType) async {
-    List<Reviews> reviews = await ApiService.getComments(movieId,
-        start: (page - 1) * pagesize, count: pagesize);
+  void getCommentsList(movieId, int page, loadDataType) async {
+    List<Reviews> reviews =
+        await ApiService.getComments(movieId, page: page, limit: pageSize);
     if (isFirst) {
       isFirst = false;
       if (reviews.isEmpty) {
@@ -83,7 +82,7 @@ class _MovieCommentPageState extends State<MovieCommentPage> {
           ? null
           : () async {
               page++;
-              getCommentsList(widget.id, page, pagesize, RefreshType.LOAD_MORE);
+              getCommentsList(widget.id, page, RefreshType.LOAD_MORE);
             },
       child: ListView.builder(
         itemBuilder: (context, index) {

@@ -1,30 +1,21 @@
-import 'dart:math';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'package:flutter_app/bean/news.dart';
-import 'package:flutter_app/bean/movie.dart';
-
-import 'movie_classify_page.dart';
-import 'movie_hot.dart';
-import 'movie_soon.dart';
-
-import '../ui/index.dart';
+import 'package:flutter_app/movie/index.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 
 import '../../page_index.dart';
 
 class MovieHomePage extends StatefulWidget {
+  MovieHomePage({Key key}) : super(key: key);
+
   @override
   createState() => _MovieHomePageState();
 }
 
 class _MovieHomePageState extends State<MovieHomePage> {
-  /// 分类浏览每个大类分别随机一个小分类
-  List<String> tags = [];
+  LoaderState _status = LoaderState.Loading;
 
   /// 头部banner新闻
-  List<News> banner = [];
+  List<News> banners = [];
 
   /// 影院热映
   List<Movie> hotMovies = [];
@@ -32,101 +23,127 @@ class _MovieHomePageState extends State<MovieHomePage> {
   /// 即将上映
   List<Movie> soonMovies = [];
 
-  /// Top250
-  List<Movie> top250 = [];
+  List<MovieTag> ranges = [];
 
-  /// 北美票房排行榜
-  List<Movie> us = [];
-
-  /// 一周口碑排行榜
-  List<Movie> weekly = [];
-
-  /// 一周最新电影排行榜
-  List<Movie> news = [];
-
-  List<List<Movie>> movies = [];
-
-  LoaderState _status = LoaderState.Loading;
+  List<Widget> widgets = [];
 
   @override
   void initState() {
     super.initState();
 
-    tags
-      ..add(
-          '${Config.GenreList[Random().nextInt(Config.GenreList.length - 1)]}')
-      ..add(
-          '${Config.RegionList[Random().nextInt(Config.RegionList.length - 1)]}')
-      ..add(
-          '${Config.FeatureList[Random().nextInt(Config.FeatureList.length - 1)]}')
-      ..add('${Config.YearList[Random().nextInt(Config.YearList.length - 1)]}');
-
-    getHomeData();
+    getMovieData("北京");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-            automaticallyImplyLeading: false,
-            title: Text('豆瓣电影'),
-            actions: <Widget>[
-              IconButton(
-                  icon: Icon(Icons.search, color: Colors.white),
-                  onPressed: () {})
-            ]),
-        body: bodyView(),
-        backgroundColor: Colors.white);
-  }
-
-  Future<void> getHomeData() async {
-    banner = await ApiService.getNewsList();
-    hotMovies =
-        await ApiService.getNowPlayingList(city: "北京", start: 0, count: 6);
-    soonMovies = await ApiService.getComingList(start: 0, count: 6);
-
-    top250 = await ApiService.getTop250List(start: 0, count: 10);
-    news = await ApiService.getNewMoviesList();
-    us = await ApiService.getUsBoxList();
-    weekly = await ApiService.getWeeklyList();
-
-    setState(() {
-      movies..add(weekly)..add(top250)..add(news)..add(us);
-
-      _status = LoaderState.Succeed;
-    });
-  }
-
-  Widget bodyView() {
-    return LoaderContainer(
-        loaderState: _status,
-        loadingView: getLoadingWidget(),
+      appBar: AppBar(
+        title: Text('豆瓣电影'),
+        automaticallyImplyLeading: false,
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(FontAwesome.filter),
+              onPressed: () => pushNewPage(context, MovieFilterPage()))
+        ],
+      ),
+      backgroundColor: Colors.white,
+      body: LoaderContainer(
         contentView: ListView(
+          padding: EdgeInsets.zero,
           physics: const BouncingScrollPhysics(),
           children: <Widget>[
-            BannerView(banner: banner),
-            SectionView("影院热映",
-                onPressed: () => pushNewPage(context, MovieHotPage())),
-            Container(
-                padding: EdgeInsets.all(6.0),
-                child: Wrap(
-                    spacing: 5,
-                    runSpacing: 5,
-                    children: hotMovies
-                        .map((movie) => MovieGridView(movie))
-                        .toList())),
-            SectionView("即将上映",
-                onPressed: () => pushNewPage(context, MovieSoonPage())),
-            ItemGridView(movies: soonMovies),
-            SectionView("电影榜单", hiddenMore: true),
-            RankingBanner(movies),
-            SectionView("分类浏览",
-                onPressed: () => pushNewPage(context, MovieClassifyPage())),
-            ClassifySection(tags[0]),
-            ClassifySection(tags[1]),
-            ClassifySection(tags[2]),
-            ClassifySection(tags[3]),
+            BannerView(banner: banners),
+            SectionView(
+              "影院热映",
+              onPressed: () => pushNewPage(context, MovieHotPage()),
+              child: Container(
+                  padding: EdgeInsets.all(6.0),
+                  child: Wrap(
+                      spacing: 5,
+                      runSpacing: 5,
+                      children: hotMovies
+                          .map((movie) => MovieGridView(movie))
+                          .toList())),
+            ),
+            SectionView(
+              "即将上映",
+              onPressed: () => pushNewPage(context, MovieSoonPage()),
+              child: ItemGridView(movies: soonMovies),
+            ),
+            SectionView(
+              "电影榜单",
+              more: '年度榜单',
+              onPressed: () => showYearsDialog(),
+              child: RankingBanner(ranges),
+            ),
+            SectionView(
+              "分类浏览",
+              onPressed: () => pushNewPage(context, MovieClassifyPage()),
+              child: Column(children: widgets),
+            ),
           ],
-        ));
+        ),
+        loaderState: _status,
+      ),
+    );
+  }
+
+  void getMovieData(String city) async {
+    MovieHomeData data = await ApiService.getMovieHomeData(city: city);
+
+    if (data != null) {
+      _status = LoaderState.Succeed;
+
+      banners = data.banners;
+      hotMovies = data.inTheaters;
+      soonMovies = data.soonMovies;
+
+      List<MovieTag> tags = data.category;
+
+      widgets = [
+        ClassifySection(tags[0].title, tags[0].subjects),
+        ClassifySection(tags[1].title, tags[1].subjects),
+        ClassifySection(tags[2].title, tags[2].subjects)
+      ];
+
+      ranges = data.ranges;
+    }
+
+    setState(() {});
+  }
+
+  void showYearsDialog() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return SimpleDialog(
+            title: Text('豆瓣年度榜单'),
+            titlePadding: EdgeInsets.all(20),
+            children: <Widget>[
+              ListTile(
+                title: Text('豆瓣电影2016年度榜单'),
+                onTap: () {
+                  Navigator.pop(context);
+                  pushNewPage(context, MovieRangePage(year: 2016));
+                },
+              ),
+              ListTile(
+                title: Text('豆瓣电影2017年度榜单'),
+                onTap: () {
+                  Navigator.pop(context);
+                  pushNewPage(context, MovieRangePage(year: 2017));
+                },
+              ),
+              ListTile(
+                title: Text('豆瓣电影2018年度榜单'),
+                onTap: () {
+                  Navigator.pop(context);
+                  pushNewPage(context, MovieRangePage(year: 2018));
+                },
+              ),
+            ],
+            contentPadding: EdgeInsets.all(0),
+          );
+        });
   }
 }

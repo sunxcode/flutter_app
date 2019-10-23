@@ -5,6 +5,7 @@ import 'package:custom_widgets/wave.dart';
 import 'package:flutter/material.dart';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_app/bean/music.dart';
 import 'package:flutter_app/page_index.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:http/http.dart';
@@ -80,10 +81,9 @@ class _AudioPlayersPageState extends State<AudioPlayersPage>
   }
 
   void initPlayer() async {
-    totalSongs = musicBase.length;
+    totalSongs = songsData.length;
     _index = 0;
-    songTitle =
-        "${musicBase[_index]['name']} - ${musicBase[_index]['artists']}";
+    songTitle = "${songsData[_index].title} - ${songsData[_index].artists}";
 
     audioPlayer = AudioPlayer(mode: PlayerMode.MEDIA_PLAYER);
     audioPlayer.setReleaseMode(ReleaseMode.RELEASE);
@@ -150,14 +150,13 @@ class _AudioPlayersPageState extends State<AudioPlayersPage>
     _controller.forward();
 
     final result =
-        await audioPlayer.play(musicBase[_index]['url'], isLocal: isLocal);
+        await audioPlayer.play(songsData[_index].audioPath, isLocal: isLocal);
     if (result == 1) {
       debugPrint('=============${audioPlayer.playerId}');
       setState(() {
         playerState = PlayerState.playing;
         _icon = Icons.pause;
-        songTitle =
-            "${musicBase[_index]['name']} - ${musicBase[_index]['artists']}";
+        songTitle = "${songsData[_index].title} - ${songsData[_index].artists}";
       });
     }
     return result;
@@ -170,8 +169,7 @@ class _AudioPlayersPageState extends State<AudioPlayersPage>
       setState(() {
         playerState = PlayerState.paused;
         _icon = Icons.play_arrow;
-        songTitle =
-            "${musicBase[_index]['name']} - ${musicBase[_index]['artists']}";
+        songTitle = "${songsData[_index].title} - ${songsData[_index].artists}";
       });
     return result;
   }
@@ -244,7 +242,7 @@ class _AudioPlayersPageState extends State<AudioPlayersPage>
           // Seek bar
           Expanded(
               child: RadialSeekBarUI(
-                  imageUrl: musicBase[_index]['img1v1Url'],
+                  imageUrl: songsData[_index].albumArtUrl,
                   controller: _controller,
                   thumbPercent: _thumbPercent,
                   onDragEnd: (double percent) {
@@ -387,37 +385,38 @@ class _AudioPlayersPageState extends State<AudioPlayersPage>
   }
 
   Widget _buildPlayPausedButton() {
-    return RawMaterialButton(
-        onPressed: () {
-          if (isPlaying) {
-            _pause();
-          } else {
-            _play();
-          }
-        },
-        shape: CircleBorder(),
-        fillColor: Colors.white,
-        splashColor: lightAccentColor,
-        highlightColor: lightAccentColor.withOpacity(0.5),
-        elevation: 10.0,
-        highlightElevation: 5,
-        child: Padding(
-            padding: EdgeInsets.all(8),
-            child: Icon(_icon, color: darkAccentColor, size: 35)));
+    return CircleButton(
+      onPressedAction: () {
+        if (isPlaying) {
+          _pause();
+        } else {
+          _play();
+        }
+      },
+      fillColor: Colors.white,
+      splashColor: lightAccentColor,
+      highlightColor: lightAccentColor.withOpacity(0.5),
+      elevation: 10.0,
+      highlightElevation: 5,
+      icon: _icon,
+      iconSize: 35,
+      size: 50,
+      iconColor: darkAccentColor,
+    );
   }
 
   Widget _bottomSheetItem(BuildContext context) {
     return ListView(
         // 生成一个列表选择器
-        children: musicBase.map((song) {
-      int index = musicBase.indexOf(song);
+        children: songsData.map((song) {
+      int index = songsData.indexOf(song);
       return ListTile(
-          leading: ImageLoadView('${song['img1v1Url']}',
+          leading: ImageLoadView('${song.albumArtUrl}',
               width: 40,
               height: 40,
               fit: BoxFit.cover,
               borderRadius: BorderRadius.all(Radius.circular(20.0))),
-          title: Text('${song['name']}'),
+          title: Text('${song.title}'),
           onTap: () {
             if (isPlaying || isPaused) {
               if (_index != index)

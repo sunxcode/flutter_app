@@ -1,16 +1,9 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_app/bean/movie.dart';
-import '../page/movie_photos.dart';
-import '../page/movie_with_celebrity.dart';
-import 'package:flutter_app/service/api_service.dart';
-import '../ui/cover_section_view.dart';
-import '../ui/expandable_text.dart';
-import '../ui/movie_celebrity_header.dart';
-import '../ui/movie_grid_view.dart';
 
 import '../../page_index.dart';
+import '../index.dart';
 
 class MovieCelebrityPage extends StatefulWidget {
   final String id;
@@ -56,11 +49,7 @@ class _MovieCelebrityPageState extends State<MovieCelebrityPage> {
         body: getLoadingWidget(),
       );
     } else {
-      List<Movie> movies = [];
-
-      celebrity.works.map((work) {
-        movies.add(work.subject);
-      }).toList();
+      List<Movie> movies = celebrity.subjects;
 
       double width = (Utils.width - 6 * 2 - 5 * 2) / 3;
       double height = width * 383 / 270 + 50;
@@ -90,19 +79,23 @@ class _MovieCelebrityPageState extends State<MovieCelebrityPage> {
           SliverList(
             delegate: SliverChildListDelegate(
               <Widget>[
-                SectionView("简介", hiddenMore: true, textColor: Colors.white),
-                Padding(
-                  padding:
-                      const EdgeInsets.only(top: 10.0, left: 10, right: 10),
-                  child: ExpandableText(
-                    desc,
-                    textColor: Colors.white,
-                    iconColor: Colors.white,
-                    iconTextColor: Colors.white,
-                    alignment: MainAxisAlignment.center,
-                    fontSize: 15.0,
-                    isShow: isSummaryUnfold,
-                    onPressed: () => changeSummaryMaxLines(),
+                SectionView(
+                  "简介",
+                  hiddenMore: true,
+                  textColor: Colors.white,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.only(top: 10.0, left: 10, right: 10),
+                    child: ExpandableText(
+                      desc,
+                      textColor: Colors.white,
+                      iconColor: Colors.white,
+                      iconTextColor: Colors.white,
+                      alignment: MainAxisAlignment.center,
+                      fontSize: 15.0,
+                      isShow: isSummaryUnfold,
+                      onPressed: () => changeSummaryMaxLines(),
+                    ),
                   ),
                 ),
                 CoverSectionView(
@@ -188,7 +181,8 @@ class _MovieCelebrityPageState extends State<MovieCelebrityPage> {
     if (celebrity.photos.isNotEmpty) {
       pageColor = await Utils.getImageDominantColor(celebrity.photos[0].cover);
     } else {
-      pageColor = await Utils.getImageDominantColor(celebrity.avatars.small);
+      pageColor = await Utils.getImageDominantColor(
+          celebrity?.avatars?.small ?? douBanDefaultImage);
     }
 
     setState(() {});

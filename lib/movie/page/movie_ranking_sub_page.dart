@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/bean/movie.dart';
-
-import '../page/movie_detail.dart';
-import '../ui/item_ranking_movie.dart';
 
 import '../../page_index.dart';
+import '../index.dart';
 
 class MovieRankingSubPage extends StatefulWidget {
   final String url;
@@ -12,7 +9,7 @@ class MovieRankingSubPage extends StatefulWidget {
   MovieRankingSubPage(this.url, {Key key}) : super(key: key);
 
   @override
-  _MovieRankingSubPageState createState() => _MovieRankingSubPageState();
+  createState() => _MovieRankingSubPageState();
 }
 
 class _MovieRankingSubPageState extends State<MovieRankingSubPage>
@@ -50,10 +47,7 @@ class _MovieRankingSubPageState extends State<MovieRankingSubPage>
                 if (snapshot.data.length > 0) {
                   return ListView.builder(
                       itemBuilder: (context, index) {
-                        Movie movie = (widget.url == ApiUrl.US_MOVIES_URL ||
-                                widget.url == ApiUrl.WEEKLY_MOVIES_URL)
-                            ? snapshot.data[index].subject
-                            : snapshot.data[index];
+                        Movie movie = snapshot.data[index];
                         return ItemRankingMovie(movie,
                             index: index,
                             onTap: () =>

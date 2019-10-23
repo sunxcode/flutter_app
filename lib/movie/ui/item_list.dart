@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/bean/movie.dart';
-import 'package:custom_widgets/custom_widgets.dart';
 
 import '../../page_index.dart';
 
@@ -76,17 +75,6 @@ class ItemList extends StatelessWidget {
                   color: Colors.deepOrange,
                 ),
               ),
-            ],
-          ),
-
-          /// 看过人数
-          Row(
-            children: <Widget>[
-              Text(
-                movie.collectCount.toString(),
-                style: TextStyle(fontSize: 14.0, color: Colors.orange),
-              ),
-              Text("人看过"),
             ],
           ),
         ],

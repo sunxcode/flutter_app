@@ -1,36 +1,28 @@
 class ApiUrl {
   static const String BASE_URL = 'http://data.chingsoft.com/api/v1/';
 
-  /// 豆瓣电影
-  static const String DOUBAN_WEB_URL = 'https://movie.douban.com/';
-
   static const String MOVIE_BASE_URL = "https://api.douban.com/v2/movie";
 
-  static final String MOVIE_LIST_URL = "/in_theaters";
-  static final String MOVIE_DETAIL_URL = '/subject/:movieId';
-  static final String MOVIE_PHOTO_URL = '/subject/:movieId/photos';
-  static final String MOVIE_TOP250_URL = "/top250";
-  static final String MOVIE_SEARCH_URL = "/search";
-  static final String MOVIE_SOON_URL = "/coming_soon";
-  static final String NEW_MOVIES_URL = "/new_movies";
-  static final String WEEKLY_MOVIES_URL = "/weekly";
-  static final String US_MOVIES_URL = "/us_box";
+  static final String MOVIE_HOME_URL = "movies/home_data";
 
-  static final String MOVIE_PHOTOS_URL = '/:url/:id/photos';
+  static final String MOVIE_LIST_URL = "movies/in_theaters";
+  static final String MOVIE_DETAIL_URL = 'movies/details';
+  static final String MOVIE_TOP250_URL = "movies/top250";
+  static final String MOVIE_SEARCH_BY_TAG_URL = "movies/search_by_tag";
+  static final String MOVIE_FILTER_URL = "movies/screening";
+  static final String MOVIE_RANGE_URL = "movies/ranges";
+  static final String MOVIE_SOON_URL = "movies/coming_soon";
+  static final String NEW_MOVIES_URL = "movies/new_movies";
+  static final String WEEKLY_MOVIES_URL = "movies/weekly";
+  static final String US_MOVIES_URL = "movies/us_box";
 
-  static final String MOVIE_CELEBRITY_URL = "/celebrity/:actorId";
-  static final String MOVIE_CELEBRITY_PHOTOS_URL = "/celebrity/:actorId/photos";
-  static final String MOVIE_CELEBRITY_WORKS_URL = "/celebrity/:actorId/works";
+  static final String MOVIE_PHOTOS_URL = 'movies/photos';
 
-  static final String MOVIE_COMMENTS_URL = '/subject/:movieId/comments';
-  static final String MOVIE_REVIEWS_URL = '/subject/:movieId/reviews';
+  static final String MOVIE_CELEBRITY_URL = "movies/celebrity";
+  static final String MOVIE_CELEBRITY_WORKS_URL = "movies/works";
 
-  /// 每日一文
-  static final String ARTICLE_BASE_URL = "https://interface.meiriyiwen.com";
-
-  static final String ARTICLE_TODAY_URL = "/article/today";
-  static final String ARTICLE_DAY_URL = "/article/day";
-  static final String ARTICLE_RANDOM_URL = "/article/random";
+  static final String MOVIE_COMMENTS_URL = 'movies/comments';
+  static final String MOVIE_REVIEWS_URL = 'movies/reviews';
 
   /// 和风天气
   static final String WEATHER_BASE_URL = "https://free-api.heweather.net/s6";
@@ -70,6 +62,11 @@ class ApiUrl {
   static final String JUZIMI_LIST_URL = 'juzimi/list';
   static final String JUZIMI_TAG_LIST_URL = 'juzimi/tag_list';
   static final String JUZIMI_DETAILS_URL = 'juzimi/details';
+
+  /// 每日一文
+  static final String ARTICLE_TODAY_URL = "juzimi/article_today";
+  static final String ARTICLE_DAY_URL = "juzimi/article_day";
+  static final String ARTICLE_RANDOM_URL = "juzimi/article_random";
 
   static final String MEIZITU_URL = 'https://m.image.so.com/';
 
